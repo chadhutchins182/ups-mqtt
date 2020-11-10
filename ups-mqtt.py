@@ -20,16 +20,18 @@ config.optionxform = str
 config.read(config_dir)
 
 cached_values = {}
-base_topic = config['MQTT'].get('base_topic', 'home/ups')
+
+base_topic = os.getenv('base_topic', 'home/ups')
 if not base_topic.endswith('/'):
     base_topic += '/'
 
-ups_host = config['UPS'].get('hostname', 'localhost')
-mqtt_host = config['MQTT'].get('hostname', 'localhost')
-mqtt_port = config['MQTT'].getint('port', 1883)
-mqtt_user = config['MQTT'].get('username', None)
-mqtt_password = config['MQTT'].get('password', None)
-interval = config['General'].getint('interval', 60)
+ups_host = os.getenv('ups_hostname', 'localhost')
+mqtt_host = os.getenv('mqtt_hostname', 'localhost')
+mqtt_port = os.getenv('mqtt_port', 1883)
+mqtt_user = os.getenv('mqtt_username', None)
+mqtt_password = os.getenv('mqtt_password', None)
+interval = os.getenv('interval', 60)
+
 
 def process():
     ups = subprocess.run(["upsc", "ups@" + ups_host], stdout=subprocess.PIPE)
@@ -49,15 +51,19 @@ def process():
             cached_values[key] = value
             topic = base_topic + key.replace('.', '/').replace(' ', '_')
             msgs.append((topic, value, 0, True))
-        
+
         timestamp = time.time()
         msgs.append((base_topic + 'timestamp', timestamp, 0, True))
-        msgs.append((base_topic + 'lastUpdate', datetime.datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S %Z'), 0, True))
-        mqtt.multiple(msgs, hostname=mqtt_host, port=mqtt_port, auth={'username': mqtt_user, 'password': mqtt_password})
+        msgs.append((base_topic + 'lastUpdate', datetime.datetime.fromtimestamp(
+            timestamp).strftime('%Y-%m-%d %H:%M:%S %Z'), 0, True))
 
+        if mqtt_host == None or mqtt_password == None:
+            mqtt.multiple(msgs, hostname=mqtt_host, port=mqtt_port)
+        else:
+            mqtt.multiple(msgs, hostname=mqtt_host, port=mqtt_port, auth={
+                          'username': mqtt_user, 'password': mqtt_password})
 
 
 while True:
     process()
     sleep(interval)
-    
