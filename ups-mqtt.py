@@ -32,6 +32,7 @@ mqtt_user = os.getenv('mqtt_username', None)
 mqtt_password = os.getenv('mqtt_password', None)
 interval = os.getenv('interval', 60)
 
+
 def process():
     ups = subprocess.run(["upsc", "ups@" + ups_host], stdout=subprocess.PIPE)
     lines = ups.stdout.decode('utf-8').split('\n')
@@ -50,15 +51,19 @@ def process():
             cached_values[key] = value
             topic = base_topic + key.replace('.', '/').replace(' ', '_')
             msgs.append((topic, value, 0, True))
-        
+
         timestamp = time.time()
         msgs.append((base_topic + 'timestamp', timestamp, 0, True))
-        msgs.append((base_topic + 'lastUpdate', datetime.datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S %Z'), 0, True))
-        mqtt.multiple(msgs, hostname=mqtt_host, port=mqtt_port, auth={'username': mqtt_user, 'password': mqtt_password})
+        msgs.append((base_topic + 'lastUpdate', datetime.datetime.fromtimestamp(
+            timestamp).strftime('%Y-%m-%d %H:%M:%S %Z'), 0, True))
 
+        if mqtt_host == None or mqtt_password == None:
+            mqtt.multiple(msgs, hostname=mqtt_host, port=mqtt_port)
+        else:
+            mqtt.multiple(msgs, hostname=mqtt_host, port=mqtt_port, auth={
+                          'username': mqtt_user, 'password': mqtt_password})
 
 
 while True:
     process()
     sleep(interval)
-    
