@@ -20,16 +20,17 @@ config.optionxform = str
 config.read(config_dir)
 
 cached_values = {}
-base_topic = config['MQTT'].get('base_topic', 'home/ups')
+
+base_topic = os.getenv('base_topic', 'home/ups')
 if not base_topic.endswith('/'):
     base_topic += '/'
 
-ups_host = config['UPS'].get('hostname', 'localhost')
-mqtt_host = config['MQTT'].get('hostname', 'localhost')
-mqtt_port = config['MQTT'].getint('port', 1883)
-mqtt_user = config['MQTT'].get('username', None)
-mqtt_password = config['MQTT'].get('password', None)
-interval = config['General'].getint('interval', 60)
+ups_host = os.getenv('ups_hostname', 'localhost')
+mqtt_host = os.getenv('mqtt_hostname', 'localhost')
+mqtt_port = os.getenv('mqtt_port', 1883)
+mqtt_user = os.getenv('mqtt_username', None)
+mqtt_password = os.getenv('mqtt_password', None)
+interval = os.getenv('interval', 60)
 
 def process():
     ups = subprocess.run(["upsc", "ups@" + ups_host], stdout=subprocess.PIPE)
