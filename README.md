@@ -5,7 +5,7 @@
 
 [![Status](https://img.shields.io/badge/status-active-success.svg)]()
 ![CI](https://github.com/chadhutchins182/ups-mqtt/workflows/CI/badge.svg)
-[![GitHub Pull Requests](https://img.shields.io/github/issues-pr/chadhutchins182/ups-mqtt.svg)](https://github.com/kylelobo/The-Documentation-Compendium/pulls)
+[![GitHub Pull Requests](https://img.shields.io/github/issues-pr/chadhutchins182/ups-mqtt.svg)](https://github.com/chadhutchins182/ups-mqtt/pulls)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](/LICENSE)
 
 </div>
