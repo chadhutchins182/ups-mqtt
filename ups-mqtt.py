@@ -10,31 +10,28 @@ import datetime
 from configparser import ConfigParser
 import shutil
 
-if not os.path.exists('conf/config.ini'):
-    shutil.copy('config.ini', 'conf/config.ini')
-
-# Load configuration file
-config_dir = os.path.join(os.getcwd(), 'conf/config.ini')
-config = ConfigParser(delimiters=('=', ), inline_comment_prefixes=('#'))
-config.optionxform = str
-config.read(config_dir)
-
 cached_values = {}
 
-base_topic = os.getenv('base_topic', 'home/ups')
+base_topic = os.environ.get('base_topic', 'home/ups')
 if not base_topic.endswith('/'):
     base_topic += '/'
 
-ups_host = os.getenv('ups_hostname', 'localhost')
-mqtt_host = os.getenv('mqtt_hostname', 'localhost')
-mqtt_port = os.getenv('mqtt_port', 1883)
-mqtt_user = os.getenv('mqtt_username', None)
-mqtt_password = os.getenv('mqtt_password', None)
-interval = os.getenv('interval', 60)
+ups_host = os.environ.get('ups_hostname', 'localhost')
+mqtt_host = os.environ.get('mqtt_hostname', 'localhost')
+mqtt_port = int(os.environ.get('mqtt_port', 1883))
+mqtt_user = os.environ.get('mqtt_username', None)
+mqtt_password = os.environ.get('mqtt_password', None)
+interval = int(os.environ.get('interval', 60))
+
+print("ups_host: ", ups_host)
+print("mqtt_host: ", mqtt_host)
+print("mqtt_port: ", mqtt_port)
+print("mqtt_password: ", mqtt_password)
+print("interval: ", interval)
 
 
 def process():
-    ups = subprocess.run(["upsc", "ups@" + ups_host], stdout=subprocess.PIPE)
+    ups = subprocess.run(["upsc", ups_host], stdout=subprocess.PIPE)
     lines = ups.stdout.decode('utf-8').split('\n')
 
     msgs = []
